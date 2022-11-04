@@ -5,8 +5,8 @@ const MongoClient = require('mongodb').MongoClient
 
 var db, collection;
 
-const url = "mongodb+srv://demo:demo@cluster0-q2ojb.mongodb.net/test?retryWrites=true";
-const dbName = "demo";
+const url = "mongodb+srv://mdoBackend421:tfLD2x-i5QajL7Q@cluster0.dcmy4kq.mongodb.net/?retryWrites=true&w=majority";
+const dbName = "savage";
 
 app.listen(3000, () => {
     MongoClient.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }, (error, client) => {
@@ -38,11 +38,31 @@ app.post('/messages', (req, res) => {
   })
 })
 
-app.put('/messages', (req, res) => {
+app.put('/messages/thumbUp', (req, res) => {
+  db.collection('messages')
+  .findOneAndUpdate({name: req.body.name, msg: req.body.msg}, {
+    //$inc: {
+      //thumbUp: req.body.thumbUp ? 1:0
+      //thumbDown: req.body.thumbUp ? 0:1
+    //}
+    $set: {
+      thumbUp:req.body.thumbUp + 1,
+    }
+  }, {
+    sort: {_id: -1},
+    upsert: true
+  }, (err, result) => {
+    if (err) return res.send(err)
+    res.send(result)
+  })
+})
+
+app.put('/messages/thumbDown', (req, res) => {
   db.collection('messages')
   .findOneAndUpdate({name: req.body.name, msg: req.body.msg}, {
     $set: {
-      thumbUp:req.body.thumbUp + 1
+      thumbDown:req.body.thumbDown + 1,
+      thumbUp:req.body.thumbUp - 1,
     }
   }, {
     sort: {_id: -1},
